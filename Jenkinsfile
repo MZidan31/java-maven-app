@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_TAG = "jma-1.1"
+    }
+
     tools {
         maven 'maven-3.9'
     }
@@ -18,11 +22,11 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    echo "Building the Docker image..."
+                    echo "Building and pushing Docker image with tag: ${IMAGE_TAG}"
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credential', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh 'docker build -t masjidan/demo-app:jma-2.0 .'
-                        sh 'echo \$PASS | docker login -u \$USER --password-stdin'
-                        sh 'docker push masjidan/demo-app:jma-2.0'
+                        sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
+                        sh "docker build -t masjidan/demo-app:${IMAGE_TAG} ."
+                        sh "docker push masjidan/demo-app:${IMAGE_TAG}"
                     }
                 }
             }
@@ -32,6 +36,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying the application..."
+                    // Tambahkan langkah deployment sesuai kebutuhan Anda di sini
                 }
             }
         }
