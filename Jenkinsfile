@@ -8,7 +8,10 @@ pipeline {
     stages {
         stage('Build jar') {
             steps {
-                sh 'mvn package'
+                script {
+                    echo "Building the JAR file..."
+                    sh 'mvn package'
+                }
             }
         }
 
@@ -18,7 +21,7 @@ pipeline {
                     echo "Building the Docker image..."
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credential', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                         sh 'docker build -t masjidan/demo-app:jma-2.0 .'
-                        sh 'echo \$PASS | docker login -u masjidan --password-stdin'
+                        sh 'echo \$PASS | docker login -u \$USER --password-stdin'
                         sh 'docker push masjidan/demo-app:jma-2.0'
                     }
                 }
