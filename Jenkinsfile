@@ -2,21 +2,34 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Test') {
             steps {
-                echo 'Building the application...'
+                script {
+                    echo "Testing the application..."
+                    echo "Executing pipeline for branch ${BRANCH_NAME}"
+                }
             }
         }
 
-        stage('Test') {
+        stage('Build') {
+            when {
+                expression { BRANCH_NAME == 'main' }
+            }
             steps {
-                echo 'Testing the application...'
+                script {
+                    echo "Building the application..."
+                }
             }
         }
 
         stage('Deploy') {
+            when {
+                expression { BRANCH_NAME == 'main' }
+            }
             steps {
-                echo 'Deploying the application...'
+                script {
+                    echo "Deploying the application..."
+                }
             }
         }
     }
