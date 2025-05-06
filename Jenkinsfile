@@ -1,54 +1,34 @@
-@Library('jenkins-shared-library') _
-
 pipeline {
     agent any
-    tools {
-        maven 'maven-3.9'
-    }
-    environment {
-        DOCKER_IMAGE = 'azeshion21/demo-app:jma-3.0'
-    }
+
     stages {
-        stage("Initialize") {
+        stage('Test') {
             steps {
                 script {
-                    gv = load "script.groovy"
+                    echo "Testing the application..."
+                    echo "Executing pipeline for branch ${BRANCH_NAME}"
                 }
             }
         }
-        stage("Build JAR") {
+
+        stage('Build') {
+            when {
+                expression { BRANCH_NAME == 'main' }
+            }
             steps {
                 script {
-                    try {
-                        gv.buildJar()
-                    } catch (Exception e) {
-                        echo "Error building JAR: ${e.message}"
-                        throw e
-                    }
+                    echo "Building the application..."
                 }
             }
         }
-        stage("Build Docker Image") {
-            steps {
-                script {
-                    try {
-                        gv.buildImage(env.DOCKER_IMAGE)
-                    } catch (Exception e) {
-                        echo "Error building Docker image: ${e.message}"
-                        throw e
-                    }
-                }
+
+        stage('Deploy') {
+            when {
+                expression { BRANCH_NAME == 'main' }
             }
-        }
-        stage("Deploy to Production") {
             steps {
                 script {
-                    try {
-                        gv.deployApp()
-                    } catch (Exception e) {
-                        echo "Error deploying application: ${e.message}"
-                        throw e
-                    }
+                    echo "Deploying the application..."
                 }
             }
         }
